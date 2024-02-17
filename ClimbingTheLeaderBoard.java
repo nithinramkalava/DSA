@@ -1,56 +1,49 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ClimbingTheLeaderBoard {
-    public static List<Integer> climbingLeaderboard(List<Integer> ranked, List<Integer> player) {
 
-        List<Integer> ranks = new ArrayList<>();
-        List<Integer> playerRanks = new ArrayList<>();
+  public static List<Integer> climbingLeaderboard(List<Integer> ranked, List<Integer> player) {
+    
+    List<Integer> inputs = new ArrayList<Integer>();
+    ranked = ranked.stream().distinct().collect(Collectors.toList());
 
-        ranks.add(1);
-        for (int i = 1; i < ranked.size(); i++){
-            if (ranked.get(i) == ranked.get(i-1))
-                ranks.add(ranks.get(i-1));
-            else ranks.add(ranks.get(i-1) + 1);
+    int j = 0;
+    int i = ranked.size() - 1;
+    while (i >= 0 && j < player.size()) {
+      boolean iValid = (i > 0);
+      if (ranked.get(i) > player.get(j)) {
+        inputs.add(i + 2);
+        j++;
+      } else {
+        if (ranked.get(i).equals(player.get(j)) || (i == 0 && ranked.get(i) < player.get(j))) {
+            inputs.add(i + 1);
+            j++;
+            i = iValid ? i - 1 : 0;
+        } else {
+          i = iValid ? i - 1 : 0;
         }
-
-        for (int i = 0; i < player.size(); i++){
-            int score = player.get(i);
-            if (score > ranks.get(0))
-                playerRanks.add(1);
-            else if (score < player.get(player.size() - 1)) 
-                playerRanks.add(ranks.get(ranks.size() - 1));
-            else {
-                int index = binarySearch(ranks, score);
-                playerRanks.add(ranks.get(index));
-            }
-        }
-
-
-        return playerRanks;
+      }
     }
-    private static int binarySearch(List<Integer> arr, int element) {
-		int low = 0, high = arr.size() - 1, mid;
-		while (low <= high) {
-			mid = (low + high) / 2;
-			if (arr.get(mid) == element) {
-				return mid + 1;
-			}
-            else if (element < arr.get(mid) && element >= arr.get(mid+1)){
-                return mid + 1;
-            }
-            else if (element > arr.get(mid) && element <= arr.get(mid-1)){
-                return mid;
-            }
-            else if (element < arr.get(mid)) {
-				high = mid - 1;
-			} else {
-				low = mid + 1;
-			}
-		}
-		return -1;
-	}
-    public static void main(String[] args) {
-        
-    }
+    return inputs;
+  }
+
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    List<Integer> ranker = new ArrayList<>();
+
+    for (int i = 0; i < n; i++) ranker.add(sc.nextInt());
+
+    int m = sc.nextInt();
+    List<Integer> player = new ArrayList<>();
+
+    for (int i = 0; i < m; i++) player.add(sc.nextInt());
+
+    sc.close();
+
+    System.out.println(climbingLeaderboard(ranker, player).toString());
+  }
 }
